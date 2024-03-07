@@ -41,6 +41,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         Toast.makeText(ResetPasswordActivity.this, "Check your email for password reset instructions.", Toast.LENGTH_SHORT).show();
+                                        finish();
                                     } else {
                                         Toast.makeText(ResetPasswordActivity.this, "Failed to send reset email. Please check your email address.", Toast.LENGTH_SHORT).show();
                                     }
