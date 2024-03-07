@@ -1,0 +1,20 @@
+Principala functie a aplicatiei trebuie sa fie usurarea muncii muncitorilor de la uzina de apa. 
+
+Ca idee, ei (muncitorii) merg din casa in casa, au o agenda cu numarul fiecarei case, numele locatarului, indexul contorului si cantitatea de apa folosita in fiecare luna precum si diferenta de la o luna la luna actuala, pentru a se da cati metri s-au consumat de cand s-a platit ultima data. E pentru a da direct cati metri cubi de apa trebuie platiti.
+ex: Daca in ianuarie 2024 aveam 240 metri cubi pe contor iar in februarie am 245 metri cubi, asta inseamna ca am de plata 245-240 = 5 metri cubi de apa si tot asa.
+
+Aplicatia mea trebuie sa aibe:
+
+Logare pentru fiecare angajat. In functie de numele contului i se va atribui zona de citire.(De ex Regulas Ioan - Iacobini + Hontisor);
+Editare + adaugare numere case, nume locatar, index contor, cantitatea de apa si diferenta
+Photo contor cu preluare automata date apa consumata si diferenta de luna trecuta
+Stocare in baza de date pe ani, luni si zile (la citire);
+Trecere pret apa + total de plata pentru apa consumata;
+Istoric citiri 
+Poze la fiecare locuitor cu contorul de unde se vor lua si datele si completa automat;
+
+Interfata trebuie sa fie de tipul: 
+-selectare zona citire
+-Toate numerele de casa + numele tutror
+	-La selectarea unui numar, de ex 1; se va duce automat in modul citire unde ai tabele cu date si butonul: editare manual; photo; stergere photo+date ; urmatorul (nr 2); anteriorul (nr 0 nu exista pentru primul nr ); si un buton pagina principala si buton pentru back la lista mare cu numere;
+
