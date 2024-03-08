@@ -44,6 +44,25 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String email = loginUsername.getText().toString().trim();
                 String password = loginPassword.getText().toString().trim();
+
+                // Verificăm dacă adresa de email si parola sunt goale
+                if (email.isEmpty() && password.isEmpty())  {
+                    Toast.makeText(LoginActivity.this, "Va rog completati adresa de email si parola.", Toast.LENGTH_SHORT).show();
+                    return; // Întrerupe funcția onClick pentru a evita continuarea operațiilor
+                }
+                // Verificăm dacă adresa de email este goală
+                if (email.isEmpty()) {
+                    Toast.makeText(LoginActivity.this, "Te rog introdu o adresă de email.", Toast.LENGTH_SHORT).show();
+                    return; // Întrerupe funcția onClick pentru a evita continuarea operațiilor
+                }
+
+                // Verificăm dacă parola este goală
+                if (password.isEmpty()) {
+                    Toast.makeText(LoginActivity.this, "Te rog introdu o parolă.", Toast.LENGTH_SHORT).show();
+                    return; // Întrerupe funcția onClick pentru a evita continuarea operațiilor
+                }
+
+
                 firebaseAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
@@ -51,8 +70,15 @@ public class LoginActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                 } else {
-                                    Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
+                                    if (password.length() < 6) {
+                                        Toast.makeText(LoginActivity.this, "Password must have at least 6 characters.",
+                                                Toast.LENGTH_LONG).show();
+                                    } else {
+
+
+                                        Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             }
                         });
