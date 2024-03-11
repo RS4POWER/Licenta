@@ -62,13 +62,26 @@ public class LoginActivity extends AppCompatActivity {
                     return; // Întrerupe funcția onClick pentru a evita continuarea operațiilor
                 }
 
+ // varianta buna care merge!
+
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
 
                 firebaseAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
+                                    if(user != null)
+                                        if(user.isEmailVerified()) {
+                                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText(LoginActivity.this, "You have to verify Email first.",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
                                 } else {
                                     if (password.length() < 6) {
                                         Toast.makeText(LoginActivity.this, "Password must have at least 6 characters.",
@@ -79,6 +92,7 @@ public class LoginActivity extends AppCompatActivity {
                                         Toast.makeText(LoginActivity.this, "Authentication failed.",
                                                 Toast.LENGTH_SHORT).show();
                                     }
+
                                 }
                             }
                         });
