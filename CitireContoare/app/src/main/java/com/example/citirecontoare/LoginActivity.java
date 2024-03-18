@@ -75,13 +75,15 @@ public class LoginActivity extends AppCompatActivity {
 
                                     if(user != null)
                                         if(user.isEmailVerified()) {
-                                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                            startActivity(new Intent(LoginActivity.this, AfterLogIn.class));
+                                            finish();
                                         }
                                         else
                                         {
                                             Toast.makeText(LoginActivity.this, "You have to verify Email first.",
                                                     Toast.LENGTH_SHORT).show();
                                         }
+
                                 } else {
                                     if (password.length() < 6) {
                                         Toast.makeText(LoginActivity.this, "Password must have at least 6 characters.",

@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class SignupActivity extends AppCompatActivity {
@@ -77,6 +78,8 @@ public class SignupActivity extends AppCompatActivity {
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
                                                         Log.d(TAG, "Email sent.");
+                                                        Toast.makeText(SignupActivity.this, "Activation Email sent.",
+                                                                Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
                                             });
@@ -88,8 +91,14 @@ public class SignupActivity extends AppCompatActivity {
                                         Toast.makeText(SignupActivity.this, "Authentication failed.",
                                                 Toast.LENGTH_SHORT).show();
                                     }
+
+                                    if (task.getException() instanceof FirebaseAuthUserCollisionException){
+                                        // Contul există deja, afișează un mesaj de eroare sau alte acțiuni
+                                        Toast.makeText(SignupActivity.this, "Contul există deja. Utilizează o altă adresă de email.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    }
                                 }
-                            }
+
                         });
 
 
@@ -106,8 +115,6 @@ public class SignupActivity extends AppCompatActivity {
 
 
         });
-
-
 
 
     }
