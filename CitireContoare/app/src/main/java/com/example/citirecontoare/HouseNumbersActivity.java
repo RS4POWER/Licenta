@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -67,11 +68,18 @@ public class HouseNumbersActivity extends AppCompatActivity {
                                 houseButton.setLayoutParams(new LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.MATCH_PARENT,
                                         LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                                // Aici setezi un tag pentru buton, care poate fi folosit in listener pentru a identifica care buton a fost apasat
+                                houseButton.setTag(houseNumber);
+
                                 houseButton.setOnClickListener(v -> {
                                     // Acțiunea când se apasă pe butonul casei
                                     // Aici poți deschide o nouă activitate sau fragment cu detaliile casei
                                     // folosind houseNumber sau document.getId() ca identificator
                                     Log.w(TAG, "S-a deschis numarul de casa."+ houseNumber);
+
+                                    Long selectedHouseNumber = (Long) v.getTag();
+                                    openHouseDetails(selectedHouseNumber);
                                 });
                                 housesContainer.addView(houseButton);
                             }
@@ -81,6 +89,13 @@ public class HouseNumbersActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    public void openHouseDetails(Long houseNumber) {
+        Intent intent = new Intent(HouseNumbersActivity.this, HouseDetailsActivity.class);
+        intent.putExtra("HOUSE_NUMBER", houseNumber);
+        startActivity(intent);
+    }
+
 
 
 }
