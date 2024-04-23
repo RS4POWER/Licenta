@@ -90,6 +90,32 @@ public class AfterLogIn extends AppCompatActivity {
                 finish();
             }
         });
+
+        zoneButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AfterLogIn.this, HouseNumbersActivity.class);
+                intent.putExtra("zoneName", zoneButton1.getText().toString());
+                startActivity(intent);
+
+
+            }
+        });
+
+        zoneButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AfterLogIn.this, HouseNumbersActivity.class);
+                intent.putExtra("zoneName", zoneButton2.getText().toString());
+                startActivity(intent);
+            }
+        });
+
+
+
+
     }
+
+
 }
 // aici e prima incercare cu zonele in functie de utilizator; merge!
