@@ -22,7 +22,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private TextView ownerNameTextView, houseNumberTextView;
-    private EditText marcaEditText, seriaEditText, diametruEditText, dataInstalareEditText;
+    private EditText marcaEditText, seriaEditText, diametruEditText, dataInstalareEditText,stareApometruEditText,consumMcEditText,datacitiriiEditText;
     private boolean isInEditMode = false;
     private ImageButton manualModifyButton;
 
@@ -42,6 +42,9 @@ public class HouseDetailsActivity extends AppCompatActivity {
         diametruEditText = findViewById(R.id.diametruEditText);
         dataInstalareEditText = findViewById(R.id.datainstalareEditText);
         manualModifyButton = findViewById(R.id.manualModifyButton);
+        stareApometruEditText = findViewById(R.id.stareApometruEditText);
+        consumMcEditText = findViewById(R.id.consumMcEditText);
+        datacitiriiEditText = findViewById(R.id.datacitiriiEditText);
 
 
         // Inițializează restul EditText-urilor aici
@@ -104,7 +107,9 @@ public class HouseDetailsActivity extends AppCompatActivity {
         seriaEditText.setEnabled(isInEditMode);
         diametruEditText.setEnabled(isInEditMode);
         dataInstalareEditText.setEnabled(isInEditMode);
-
+        stareApometruEditText.setEnabled(isInEditMode);
+        consumMcEditText.setEnabled(isInEditMode);
+        datacitiriiEditText.setEnabled(isInEditMode);
         // Activează sau dezactivează restul EditText-urilor în funcție de isInEditMode
     }
 
@@ -115,6 +120,11 @@ public class HouseDetailsActivity extends AppCompatActivity {
         String diametru = diametruEditText.getText().toString();
         String dataInstalare = dataInstalareEditText.getText().toString();
         // Obține restul datelor din EditText-uri
+
+        if (!isValidNumber(diametru)) {
+            Toast.makeText(this, "Doar cifre sunt acceptate pentru diametru.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Referința la documentul Firestore al casei
         Long houseNumber = getIntent().getLongExtra("HOUSE_NUMBER", -1);
@@ -134,7 +144,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(HouseDetailsActivity.this, "Datele au fost salvate cu succes!", Toast.LENGTH_SHORT).show();
                     isInEditMode = false; // Dezactivează modul de editare după salvare
-                    toggleEditMode(isInEditMode); // Actualizează UI-ul
+                    toggleEditMode(false); // Actualizează UI-ul
                     //manualModifyButton.setImageResource(R.drawable.baseline_edit_note_24); // Schimbă iconița înapoi
                 })
                 .addOnFailureListener(e -> Toast.makeText(HouseDetailsActivity.this, "Eroare la salvarea datelor.", Toast.LENGTH_SHORT).show());
@@ -150,6 +160,15 @@ public class HouseDetailsActivity extends AppCompatActivity {
     // private void setupButtons() {
     //     // Inițializează butoanele și setează OnClickListener pentru fiecare
     // }
+
+    private boolean isValidNumber(String numberStr) {
+        try {
+            Long.parseLong(numberStr);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }
 
 
