@@ -11,15 +11,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HouseNumbersActivity extends AppCompatActivity {
 
@@ -49,9 +54,8 @@ public class HouseNumbersActivity extends AppCompatActivity {
             public void onClick(View v) {
                 finish(); // Închide activitatea curentă
             }
+
         });
-       // for(int i=0;i<=50;i++)
-       // loadHouseNumbers(zoneName);
 
 
     }
@@ -110,56 +114,81 @@ public class HouseNumbersActivity extends AppCompatActivity {
 
 
     public void openHouseDetails(Long houseNumber) {
-        Intent intent = new Intent(HouseNumbersActivity.this, HouseDetailsActivity.class);
-        intent.putExtra("HOUSE_NUMBER", houseNumber);
-        startActivity(intent);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        // Concatenează "Numarul " cu numărul casei pentru a obține numele documentului corect
+        String documentName = "Numarul " + houseNumber;
+        DocumentReference houseRef = db.collection("zones")
+                .document("Iacobini")
+                .collection("numereCasa")
+                .document(documentName);
+
+        houseRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                Intent intent = new Intent(HouseNumbersActivity.this, HouseDetailsActivity.class);
+                intent.putExtra("HOUSE_NUMBER", houseNumber);
+                String ownerName = documentSnapshot.getString("Proprietar"); // presupunând că acesta este numele câmpului
+                intent.putExtra("OWNER_NAME", ownerName); // Pasăm numele proprietarului către noua activitate
+                Log.d(TAG, "numar casa: " + houseNumber + " proprietar: " + ownerName);
+                startActivity(intent);
+            } else {
+                Toast.makeText(HouseNumbersActivity.this, "Detalii casa nu au fost gasite.", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(HouseNumbersActivity.this, "Eroare la obținerea detaliilor casei.", Toast.LENGTH_SHORT).show();
+        });
     }
-
-
-
 }
 
 
-/* codul dinainte de sortare
 
-private void loadHouseNumbers(String zoneName) {
-        Log.w(TAG, "S-a apleat loadHouseNumbers----------.");
+   /* private void addYear2024Data() {  metoda pentru adaugare de date in baza de date.
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("zones").document(zoneName).collection("numereCasa")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
+        WriteBatch batch = db.batch();
 
-                        for (DocumentSnapshot document : task.getResult()) {
-                            // Presupunem că există un câmp 'Numar casa' care este un număr
-                            Long houseNumber = document.getLong("Numar casa");
-                            if (houseNumber != null) {
-                                Button houseButton = new Button(HouseNumbersActivity.this);
-                                houseButton.setText("Casa " + houseNumber);
-                                houseButton.setLayoutParams(new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT));
+        // Obține referința la colecția de numere de casă
+        CollectionReference housesRef = db.collection("zones").document("Iacobini").collection("numereCasa");
 
-                                // Aici setezi un tag pentru buton, care poate fi folosit in listener pentru a identifica care buton a fost apasat
-                                houseButton.setTag(houseNumber);
+        housesRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot houseDocument : task.getResult()) {
+                    String houseId = houseDocument.getId();
 
-                                houseButton.setOnClickListener(v -> {
-                                    // Acțiunea când se apasă pe butonul casei
-                                    // Aici poți deschide o nouă activitate sau fragment cu detaliile casei
-                                    // folosind houseNumber sau document.getId() ca identificator
-                                    Log.w(TAG, "S-a deschis numarul de casa."+ houseNumber);
+                    // Referința pentru anul 2024 în colecția consumApa a fiecărei case
+                    DocumentReference year2024Ref = housesRef.document(houseId).collection("consumApa").document("2024");
 
-                                    Long selectedHouseNumber = (Long) v.getTag();
-                                    openHouseDetails(selectedHouseNumber);
-                                });
-                                housesContainer.addView(houseButton);
-                            }
-                        }
+                    // Creează documente pentru fiecare lună din anul 2024
+                    for (String month : new String[]{"Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"}) {
+                        DocumentReference monthRef = year2024Ref.collection("lunile").document(month);
+
+                        // Datele pe care dorești să le setezi pentru fiecare lună
+                        Map<String, Object> monthData = new HashMap<>();
+                        monthData.put("Consumatia mc", 0); // presupunem 0 consum inițial
+                        monthData.put("Data citire", ""); // data va fi adăugată la citire
+                        monthData.put("Observatii", ""); // completare conform necesității
+                        monthData.put("Starea Apometrului", 0); // presupunem stare bună inițială
+
+                        // Adaugă datele în batch
+                        batch.set(monthRef, monthData);
+                    }
+                }
+
+                // Execută batch-ul
+                batch.commit().addOnCompleteListener(commitTask -> {
+                    if (commitTask.isSuccessful()) {
+                        Log.d("Firestore", "Date pentru anul 2024 au fost adăugate cu succes!");
                     } else {
-                        Log.w(TAG, "Error getting house numbers: ", task.getException());
+                        Log.e("Firestore", "Eroare la adăugarea datelor pentru anul 2024", commitTask.getException());
                     }
                 });
+            } else {
+                Log.e("Firestore", "Eroare la obținerea documentelor casei", task.getException());
+            }
+        });
     }
 
 
- */
+
+    }
+}
+
+*/

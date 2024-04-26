@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@color/lavender"
+    android:background="@color/RoyalBlue"
     tools:context=".LoginActivity">
 
     <androidx.cardview.widget.CardView
@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:text="Login"
                 android:textAlignment="center"
-                android:textColor="@color/lavender"
+                android:textColor="@color/RoyalBlue"
                 android:textSize="36sp"
                 android:textStyle="bold" />
 
@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="30dp"
-                android:backgroundTint="@color/lavender"
+                android:backgroundTint="@color/RoyalBlue"
                 android:text="Login"
                 android:textSize="18sp"
                 app:cornerRadius="20dp" />
@@ -78,7 +78,7 @@
                 android:layout_marginTop="10dp"
                 android:padding="8dp"
                 android:text="Not yet registered? Sign Up"
-                android:textColor="@color/lavender"
+                android:textColor="@color/RoyalBlue"
                 android:textSize="18sp" />
 
             <TextView
@@ -89,7 +89,7 @@
                 android:layout_marginTop="10dp"
                 android:padding="8dp"
                 android:text="Reset Password"
-                android:textColor="@color/lavender"
+                android:textColor="@color/RoyalBlue"
                 android:textSize="18sp" />
 
         </LinearLayout>

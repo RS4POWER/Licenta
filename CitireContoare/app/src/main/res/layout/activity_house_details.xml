@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@color/lavender"
+    android:background="@color/RoyalBlue"
     tools:context=".HouseDetailsActivity">
 
     <androidx.cardview.widget.CardView
@@ -45,7 +45,7 @@
                     android:layout_weight="1"
                     android:text="Owner's Name"
                     android:textAlignment="center"
-                    android:textColor="@color/lavender"
+                    android:textColor="@color/RoyalBlue"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -54,7 +54,7 @@
                     android:layout_width="75dp"
                     android:layout_height="wrap_content"
                     android:text="House Number"
-                    android:textColor="@color/lavender"
+                    android:textColor="@color/RoyalBlue"
                     android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -64,7 +64,7 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:background="@color/lavender" />
+                android:background="@color/RoyalBlue" />
 
             <!-- Detalii despre apometru -->
             <TextView
@@ -72,7 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Apometru"
-                android:textColor="@color/lavender"
+                android:textColor="@color/RoyalBlue"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
@@ -87,7 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Marca: "
-                    android:textColor="@color/lavender"
+                    android:textColor="@color/RoyalBlue"
                     android:textSize="20sp" />
 
                 <EditText
@@ -112,7 +112,7 @@
                 android:layout_width="66dp"
                 android:layout_height="wrap_content"
                 android:text="Seria: "
-                android:textColor="@color/lavender"
+                android:textColor="@color/RoyalBlue"
                 android:textSize="20sp" />
 
             <EditText
@@ -137,7 +137,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Diametru: "
-                android:textColor="@color/lavender"
+                android:textColor="@color/RoyalBlue"
                 android:textSize="20sp" />
 
             <EditText
@@ -162,7 +162,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Instalat la data: "
-                android:textColor="@color/lavender"
+                android:textColor="@color/RoyalBlue"
                 android:textSize="20sp" />
 
             <EditText
@@ -181,7 +181,7 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:background="@color/lavender" />
+                android:background="@color/RoyalBlue" />
 
             <!-- Luna și anul curente -->
             <TextView
@@ -190,7 +190,7 @@
                 android:layout_height="wrap_content"
                 android:text="Luna, anul"
                 android:textAlignment="center"
-                android:textColor="@color/lavender"
+                android:textColor="@color/RoyalBlue"
                 android:textSize="21sp"
                 android:textStyle="bold" />
 
@@ -199,7 +199,7 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:background="@color/lavender" />
+                android:background="@color/RoyalBlue" />
 
             <!-- Stare apometru și consumatia mc -->
             <TextView
@@ -207,7 +207,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Stare apometru:"
-                android:textColor="@color/lavender"
+                android:textColor="@color/RoyalBlue"
                 android:textSize="20sp" />
 
             <EditText
@@ -225,7 +225,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Consumatia mc:"
-                android:textColor="@color/lavender"
+                android:textColor="@color/RoyalBlue"
                 android:textSize="20sp" />
 
             <EditText
@@ -243,7 +243,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Data citrii:"
-                android:textColor="@color/lavender"
+                android:textColor="@color/RoyalBlue"
                 android:textSize="20sp" />
 
             <EditText
@@ -270,6 +270,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:padding="8dp"
+                    android:backgroundTint="@color/RoyalBlue"
                     android:text="Luna Anterioară" />
 
                 <Button
@@ -278,6 +279,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:padding="8dp"
+                    android:backgroundTint="@color/RoyalBlue"
                     android:text="Luna Următoare" />
             </LinearLayout>
 
@@ -286,7 +288,7 @@
                 android:layout_height="1dp"
                 android:layout_marginTop="3dp"
                 android:layout_marginBottom="20dp"
-                android:background="@color/lavender" />
+                android:background="@color/RoyalBlue" />
 
             <LinearLayout
                 android:layout_width="match_parent"
