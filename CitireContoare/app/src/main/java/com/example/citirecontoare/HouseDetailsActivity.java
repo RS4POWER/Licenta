@@ -41,6 +41,8 @@ public class HouseDetailsActivity extends AppCompatActivity {
     private int currentMonth;
     private Long houseNumber;
 
+    boolean succes;
+
     public  String[] monthNames = {"Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
             "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"};
 
@@ -247,8 +249,12 @@ public class HouseDetailsActivity extends AppCompatActivity {
         // Obține restul datelor din EditText-uri
 
         if (!isValidNumber(diametru)) {
+            succes = false;
             Toast.makeText(this, "Doar cifre sunt acceptate pentru diametru.", Toast.LENGTH_SHORT).show();
             return;
+        }
+        else {
+            succes=true;
         }
 
         // Referința la documentul Firestore al casei
@@ -267,6 +273,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
         // Actualizează în Firestore
         houseRef.update(houseDetails)
                 .addOnSuccessListener(aVoid -> {
+                    if(succes!=false)
                     Toast.makeText(HouseDetailsActivity.this, "Datele au fost salvate cu succes!", Toast.LENGTH_SHORT).show();
                     isInEditMode = false; // Dezactivează modul de editare după salvare
                     toggleEditMode(false); // Actualizează UI-ul
@@ -287,8 +294,13 @@ public class HouseDetailsActivity extends AppCompatActivity {
         String dataCitirii = datacitiriiEditText.getText().toString();
 
         if (!isValidNumber(consumMc)) {
+            succes=false;
             Toast.makeText(this, "Consumația trebuie să fie un număr valid.", Toast.LENGTH_SHORT).show();
             return;
+        }
+        else
+        {
+            succes=true;
         }
 
         double consumValue = Double.parseDouble(consumMc);
