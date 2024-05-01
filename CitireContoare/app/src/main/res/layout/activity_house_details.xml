@@ -9,6 +9,7 @@
     android:background="@color/RoyalBlue"
     tools:context=".HouseDetailsActivity">
 
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -354,6 +355,7 @@
                     android:background="@drawable/baseline_image_search_24" />
             </LinearLayout>
         </LinearLayout>
+
     </androidx.cardview.widget.CardView>
 
 </LinearLayout>
