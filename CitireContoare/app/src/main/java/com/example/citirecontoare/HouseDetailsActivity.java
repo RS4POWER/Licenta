@@ -1,11 +1,20 @@
 package com.example.citirecontoare;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import android.Manifest;
 
+import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +24,11 @@ import android.widget.Toast;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -31,7 +45,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
     private TextView ownerNameTextView, houseNumberTextView;
     private EditText marcaEditText, seriaEditText, diametruEditText, dataInstalareEditText,stareApometruEditText,consumMcEditText,datacitiriiEditText;
     private boolean isInEditMode = false;
-    private ImageButton backButton,manualModifyButton,  previousYearButton, nextYearButton;
+    private ImageButton backButton,manualModifyButton,  previousYearButton, nextYearButton,takePhotoButton;
     private  Button nextMonthButton,previousMonthButton;
 
 
@@ -68,6 +82,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
         ImageButton nextYearButton = findViewById(R.id.nextYearButton);
         Button previousMonthButton = findViewById(R.id.previousMonthButton);
         Button nextMonthButton = findViewById(R.id.nextMonthButton);
+        ImageButton takePhotoButton = findViewById(R.id.takePhotoButton);
 
         // Inițializează restul EditText-urilor aici
 
@@ -84,6 +99,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
             }
 
         });
+
 
         previousYearButton.setOnClickListener(v -> {
             currentYear--;
@@ -166,6 +182,17 @@ public class HouseDetailsActivity extends AppCompatActivity {
             Toast.makeText(this, "Numărul casei nu a fost transmis corect.", Toast.LENGTH_SHORT).show();
             finish();
         }
+
+        //OCR
+
+        takePhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestCameraPermission();
+            }
+        });
+
+
     }
 
     private void loadHouseDetails(Long houseNumber) {
@@ -240,6 +267,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
         // Activează sau dezactivează restul EditText-urilor în funcție de isInEditMode
     }
 
+    @SuppressLint("SuspiciousIndentation")
     private void saveHouseDetails() {
         // Obține datele din EditText-uri și le salvează în Firestore
         String marca = marcaEditText.getText().toString();
@@ -345,6 +373,93 @@ public class HouseDetailsActivity extends AppCompatActivity {
         TextView dateTextView = findViewById(R.id.dateTextView);
         dateTextView.setText(displayText);
     }
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_CAMERA_PERMISSION = 1;
+
+    private void requestCameraPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+        } else {
+            startCamera();
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startCamera();
+            } else {
+                Toast.makeText(this, "Camera permission is necessary to use this feature", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    //OCR
+    private void startCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            if (extras != null) {
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                Log.d("OCR", "Image captured and received in the app");
+                recognizeText(imageBitmap);
+            } else {
+                Log.d("OCR", "No image data received");
+            }
+        } else {
+            Log.d("OCR", "Camera activity did not return RESULT_OK");
+        }
+    }
+
+
+
+    private void recognizeText(Bitmap bitmap) {
+        InputImage image = InputImage.fromBitmap(bitmap, 0);
+        TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+        recognizer.process(image)
+                .addOnSuccessListener(this::processTextRecognitionResult)
+                .addOnFailureListener(e -> {
+                    Log.e("OCR", "OCR Failed: " + e.getMessage());
+                    Toast.makeText(HouseDetailsActivity.this, "OCR Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+
+
+
+    private void processTextRecognitionResult(Text result) {
+        String resultText = result.getText();
+        Log.d("OCR", "OCR Result: " + resultText);
+        for (Text.TextBlock block : result.getTextBlocks()) {
+            String blockText = block.getText();
+            Log.d("OCR", "Block text: " + blockText);
+            if (blockText.matches("\\d+")) { // Regex pentru a verifica dacă textul este numeric
+                stareApometruEditText.setText(blockText);
+                Log.d("OCR", "Numeric text set in EditText: " + blockText);
+                break;
+            }
+            else
+            if (!blockText.matches("\\d+")) {
+                Log.d("OCR", "Non-numeric text detected: " + blockText);
+            }
+
+        }
+        if(resultText.isEmpty()) {
+            Log.d("OCR", "No text recognized");
+        }
+    }
+
 
 
 }
