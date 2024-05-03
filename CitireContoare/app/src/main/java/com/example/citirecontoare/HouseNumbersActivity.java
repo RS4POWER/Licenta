@@ -17,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -24,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 import java.io.File;
@@ -43,6 +46,10 @@ public class HouseNumbersActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     private Button backButton, downloadButton;
+
+    public  String[] monthNames = {"Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
+            "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,6 +168,7 @@ public class HouseNumbersActivity extends AppCompatActivity {
             if (documentSnapshot.exists()) {
                 Intent intent = new Intent(HouseNumbersActivity.this, HouseDetailsActivity.class);
                 intent.putExtra("HOUSE_NUMBER", houseNumber);
+                intent.putExtra("ZONE_NAME", zoneName);
                 String ownerName = documentSnapshot.getString("Proprietar"); // presupunând că acesta este numele câmpului
                 intent.putExtra("OWNER_NAME", ownerName); // Pasăm numele proprietarului către noua activitate
                 Log.d(TAG, "numar casa: " + houseNumber + " proprietar: " + ownerName);
@@ -181,22 +189,66 @@ public class HouseNumbersActivity extends AppCompatActivity {
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
+                        List<Task<Map<String, Object>>> subTasks = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            houseDetailsList.add(document.getData());
+                            Map<String, Object> houseData = new HashMap<>(document.getData());
+                            String docId = document.getId();
+
+                            List<Task<Map<String, Object>>> monthTasks = new ArrayList<>();
+                            for (String month : monthNames) {
+                                Task<DocumentSnapshot> monthTask = db.collection("zones")
+                                        .document(zoneName)
+                                        .collection("numereCasa")
+                                        .document(docId)
+                                        .collection("consumApa")
+                                        .document("2024")
+                                        .collection("lunile")
+                                        .document(month)
+                                        .get();
+
+                                // Ensure the continuation task returns a Map<String, Object>
+                                Task<Map<String, Object>> continuationTask = monthTask.continueWith(task1 -> {
+                                    DocumentSnapshot monthDoc = task1.getResult();
+                                    if (monthDoc != null && monthDoc.exists()) {
+                                        return Collections.singletonMap(month, monthDoc.getData());
+                                    }
+                                    return new HashMap<String, Object>();
+                                });
+                                monthTasks.add(continuationTask);
+                            }
+
+                            // When all month tasks complete, combine all month data into one map and add it to houseData
+                            Tasks.whenAllSuccess(monthTasks).addOnSuccessListener(monthResults -> {
+                                Map<String, Object> monthsData = new HashMap<>();
+                                for (Object result : monthResults) {
+                                    monthsData.putAll((Map<String, Object>) result);
+                                }
+                                houseData.put("consumApa", monthsData);
+                                houseDetailsList.add(houseData);
+                            });
+
+                            subTasks.add(Tasks.whenAll(monthTasks).continueWith(task2 -> houseData));
                         }
-                        try {
-                            createJsonFile(houseDetailsList);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+
+                        // When all house tasks complete (all data aggregated), create the JSON file
+                        Tasks.whenAllSuccess(subTasks).addOnSuccessListener(houseDetails -> {
+                            try {
+                                createJsonFile(houseDetailsList);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
                     } else {
                         Log.d("DownloadData", "Error getting documents: ", task.getException());
                     }
                 });
     }
 
+
+
+
     private void createJsonFile(ArrayList<Map<String, Object>> dataList) throws IOException {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();  // Use GsonBuilder to enable pretty printing
         String jsonString = gson.toJson(dataList);
 
         File file = new File(getExternalFilesDir(null), "HouseData.json");

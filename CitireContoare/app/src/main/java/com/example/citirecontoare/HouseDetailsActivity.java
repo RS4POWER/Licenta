@@ -54,6 +54,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
     private int currentYear;
     private int currentMonth;
     private Long houseNumber;
+    private String zoneName;
 
     boolean succes;
 
@@ -105,14 +106,14 @@ public class HouseDetailsActivity extends AppCompatActivity {
             currentYear--;
             updateDateDisplay();
             loadApometruDetails(houseNumber, currentYear, currentMonth);
-            loadHouseDetails(houseNumber);
+            loadHouseDetails(houseNumber,zoneName);
         });
 
         nextYearButton.setOnClickListener(v -> {
             currentYear++;
             updateDateDisplay();
             loadApometruDetails(houseNumber, currentYear, currentMonth);
-            loadHouseDetails(houseNumber);
+            loadHouseDetails(houseNumber,zoneName);
         });
 
         previousMonthButton.setOnClickListener(v -> {
@@ -124,7 +125,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
             }
             updateDateDisplay();
             loadApometruDetails(houseNumber, currentYear, currentMonth);
-            loadHouseDetails(houseNumber);
+            loadHouseDetails(houseNumber,zoneName);
         });
 
         nextMonthButton.setOnClickListener(v -> {
@@ -136,7 +137,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
             }
             updateDateDisplay();
             loadApometruDetails(houseNumber, currentYear, currentMonth);
-            loadHouseDetails(houseNumber);
+            loadHouseDetails(houseNumber,zoneName);
         });
 
 
@@ -156,25 +157,27 @@ public class HouseDetailsActivity extends AppCompatActivity {
         });
 
 
-        // Obține numărul casei și numele proprietarului din intent
+        // Obține numărul casei, numele zonei  și numele proprietarului din intent
         Intent intent = getIntent();
          houseNumber = intent.getLongExtra("HOUSE_NUMBER", -1);
+        zoneName = intent.getStringExtra("ZONE_NAME");
         if(houseNumber == -1) {
             Toast.makeText(this, "Numărul casei nu a fost transmis corect.", Toast.LENGTH_SHORT).show();
             finish(); // Închide activitatea dacă numărul casei nu este valid
+            return;
         }
-
+        if(zoneName == null) {
+            Toast.makeText(this, "Zona nu a fost transmisa corect.", Toast.LENGTH_SHORT).show();
+            finish(); // Închide activitatea dacă numărul casei nu este valid
+            return;
+        }
         // Setează numărul casei în TextView
         houseNumberTextView.setText(String.valueOf("NR "+houseNumber));
 
         // Aduce detalii specifice casei din Firestore
-        loadHouseDetails(houseNumber);
+        loadHouseDetails(houseNumber,zoneName);
         loadApometruDetails(houseNumber, currentYear, currentMonth);
 
-
-
-        intent = getIntent();
-         houseNumber = intent.getLongExtra("HOUSE_NUMBER", -1);
 
         if(houseNumber != -1) {
             loadApometruDetails(houseNumber, currentYear, currentMonth);
@@ -195,9 +198,9 @@ public class HouseDetailsActivity extends AppCompatActivity {
 
     }
 
-    private void loadHouseDetails(Long houseNumber) {
+    private void loadHouseDetails(Long houseNumber, String zoneName) {
         DocumentReference houseRef = db.collection("zones")
-                .document("Iacobini") // Acesta ar trebui să fie ID-ul zonei, înlocuiește-l cu valoarea corectă
+                .document(zoneName) // Acesta ar trebui să fie ID-ul zonei, înlocuiește-l cu valoarea corectă
                 .collection("numereCasa")
                 .document("Numarul " + houseNumber);
 
@@ -222,7 +225,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
     private void loadApometruDetails(Long houseNumber, int year, int month) {
         String monthName = monthNames[month];
         DocumentReference monthRef = db.collection("zones")
-                .document("Iacobini")
+                .document(zoneName)
                 .collection("numereCasa")
                 .document("Numarul " + houseNumber)
                 .collection("consumApa")
@@ -287,7 +290,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
 
         // Referința la documentul Firestore al casei
         Long houseNumber = getIntent().getLongExtra("HOUSE_NUMBER", -1);
-        DocumentReference houseRef = db.collection("zones").document("Iacobini")
+        DocumentReference houseRef = db.collection("zones").document(zoneName)
                 .collection("numereCasa").document("Numarul " + houseNumber);
 
         // Map pentru a stoca datele
@@ -335,7 +338,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
         long consumInt = (long) consumValue;
 
         DocumentReference monthRef = db.collection("zones")
-                .document("Iacobini")
+                .document(zoneName)
                 .collection("numereCasa")
                 .document("Numarul " + houseNumber)
                 .collection("consumApa")
