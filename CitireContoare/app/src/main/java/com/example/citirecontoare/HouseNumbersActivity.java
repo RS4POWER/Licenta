@@ -2,9 +2,13 @@ package com.example.citirecontoare;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +23,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.gson.Gson;
 
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,11 +37,12 @@ import java.util.Map;
 
 public class HouseNumbersActivity extends AppCompatActivity {
 
+    String zoneName;
     private LinearLayout housesContainer;
     private TextView zoneNameTextView;
     private FirebaseFirestore db;
 
-    private Button backButton;
+    private Button backButton, downloadButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,14 +51,16 @@ public class HouseNumbersActivity extends AppCompatActivity {
 
         housesContainer = findViewById(R.id.housesContainer);
         zoneNameTextView = findViewById(R.id.zoneNameTextView);
-        String zoneName = getIntent().getStringExtra("zoneName");
+         zoneName = getIntent().getStringExtra("zoneName");
         zoneNameTextView.setText(zoneName);
-
+        downloadButton=findViewById(R.id.downloadButton);
 
         db = FirebaseFirestore.getInstance();
         loadHouseNumbers(zoneName);
 
         backButton = findViewById(R.id.backButton);
+
+        Log.d("sa vedem zona-", zoneName);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,8 +68,31 @@ public class HouseNumbersActivity extends AppCompatActivity {
             }
 
         });
-
-
+        downloadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Verifică permisiunile înainte de a începe descărcarea
+                if (ContextCompat.checkSelfPermission(HouseNumbersActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    // Dacă nu sunt permisiunile necesare, cere-le
+                    ActivityCompat.requestPermissions(HouseNumbersActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                } else {
+                    // Dacă permisiunile sunt deja acordate, începe descărcarea datelor
+                    downloadData(v);
+                }
+            }
+        });
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Permisiunea a fost acordată
+            View view = new View(this);
+            downloadData(view);
+        } else {
+            // Permisiunea a fost refuzată
+            Toast.makeText(this, "Permisiunea pentru scriere pe stocare externă este necesară pentru a descărca datele.", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void loadHouseNumbers(String zoneName) {
@@ -118,7 +153,7 @@ public class HouseNumbersActivity extends AppCompatActivity {
         // Concatenează "Numarul " cu numărul casei pentru a obține numele documentului corect
         String documentName = "Numarul " + houseNumber;
         DocumentReference houseRef = db.collection("zones")
-                .document("Iacobini")
+                .document(zoneName)
                 .collection("numereCasa")
                 .document(documentName);
 
@@ -137,6 +172,43 @@ public class HouseNumbersActivity extends AppCompatActivity {
             Toast.makeText(HouseNumbersActivity.this, "Eroare la obținerea detaliilor casei.", Toast.LENGTH_SHORT).show();
         });
     }
+
+    public void downloadData(View view) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        ArrayList<Map<String, Object>> houseDetailsList = new ArrayList<>();
+
+        db.collection("zones").document(zoneName).collection("numereCasa")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            houseDetailsList.add(document.getData());
+                        }
+                        try {
+                            createJsonFile(houseDetailsList);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Log.d("DownloadData", "Error getting documents: ", task.getException());
+                    }
+                });
+    }
+
+    private void createJsonFile(ArrayList<Map<String, Object>> dataList) throws IOException {
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(dataList);
+
+        File file = new File(getExternalFilesDir(null), "HouseData.json");
+        try (FileWriter fileWriter = new FileWriter(file)) {
+            fileWriter.write(jsonString);
+            Toast.makeText(this, "Datele au fost salvate în " + file.getPath(), Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Eroare la salvarea datelor.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }
 
 

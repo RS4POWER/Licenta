@@ -36,17 +36,41 @@
         android:layout_marginTop="16dp"/>
 
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/secondDivider"
         android:layout_below="@id/divider">
 
         <LinearLayout
             android:id="@+id/housesContainer"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_above = "@id/secondDivider">
             <!-- Dinamic buttons will be added here -->
         </LinearLayout>
     </ScrollView>
+
+    <View
+        android:id="@+id/secondDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_above="@id/downloadButton"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/downloadButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Download Data"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/RoyalBlue"/>
+
+
 
 </RelativeLayout>
