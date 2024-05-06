@@ -13,6 +13,8 @@ import androidx.core.app.ActivityCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -22,7 +24,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
@@ -59,6 +64,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
 
     boolean succes;
 
+    Handler handler = new Handler(Looper.getMainLooper());
     public  String[] monthNames = {"Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
             "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"};
 
@@ -90,6 +96,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
 
         currentYear = Calendar.getInstance().get(Calendar.YEAR);
         currentMonth = Calendar.getInstance().get(Calendar.MONTH);
+
 
 
 
@@ -225,6 +232,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
 
     private void loadApometruDetails(Long houseNumber, int year, int month) {
         String monthName = monthNames[month];
+
         DocumentReference monthRef = db.collection("zones")
                 .document(zoneName)
                 .collection("numereCasa")
@@ -254,8 +262,20 @@ public class HouseDetailsActivity extends AppCompatActivity {
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "Eroare la încărcarea datelor pentru " + monthName + " " + year, Toast.LENGTH_SHORT).show();
         });
+
+
+
+
     }
 
+    private DocumentReference getMonthRef(Long houseNumber, int year, int month) {
+        if (month < 0) {
+            year -= 1; // Dacă luna este negativă, înseamnă că trebuie să te întorci în anul precedent
+            month = 11; // Decembrie este luna 11 (0 indexat)
+        }
+        String monthName = monthNames[month];
+        return db.collection("zones").document(zoneName).collection("numereCasa").document("Numarul " + houseNumber).collection("consumApa").document(String.valueOf(year)).collection("lunile").document(monthName);
+    }
 
 
 
@@ -464,6 +484,16 @@ public class HouseDetailsActivity extends AppCompatActivity {
         }
     }
 
+    private void refreshData() {
+        loadHouseDetails(houseNumber, zoneName);
+        loadApometruDetails(houseNumber, currentYear, currentMonth);
+    }
+
+    private void prepareAndSaveApometruDetails() {
+
+        refreshData();  // Asigură-te că ai cele mai recente date încărcate
+        handler.postDelayed(this::saveApometruDetails, 500); // Așteaptă puțin pentru a se încărca datele
+    }
 
 
 }
