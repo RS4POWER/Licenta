@@ -64,7 +64,6 @@ public class HouseDetailsActivity extends AppCompatActivity {
 
     boolean succes;
 
-    Handler handler = new Handler(Looper.getMainLooper());
     public  String[] monthNames = {"Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
             "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"};
 
@@ -158,6 +157,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
                 manualModifyButton.setBackgroundResource(R.drawable.baseline_done_outline_24);
             } else {
                 manualModifyButton.setBackgroundResource(R.drawable.baseline_edit_note_24);
+                Log.d("ManualModifiyButon", "s-a apelat listener pentru manualModify");
                 saveHouseDetails(); // Salvează datele când ieși din modul de editarehoue
                 saveApometruDetails();
             }
@@ -340,6 +340,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
 
 
     private void saveApometruDetails() {
+        Log.d("saveApometru","s-a apelat saveApometruDetails()");
         Long houseNumber = getIntent().getLongExtra("HOUSE_NUMBER", -1);
         String stareApometru = stareApometruEditText.getText().toString();
         String consumMc = consumMcEditText.getText().toString();
@@ -483,18 +484,6 @@ public class HouseDetailsActivity extends AppCompatActivity {
             Log.d("OCR", "No text recognized");
         }
     }
-
-    private void refreshData() {
-        loadHouseDetails(houseNumber, zoneName);
-        loadApometruDetails(houseNumber, currentYear, currentMonth);
-    }
-
-    private void prepareAndSaveApometruDetails() {
-
-        refreshData();  // Asigură-te că ai cele mai recente date încărcate
-        handler.postDelayed(this::saveApometruDetails, 500); // Așteaptă puțin pentru a se încărca datele
-    }
-
 
 }
 
