@@ -353,11 +353,11 @@
 
 
                 <ImageButton
-                    android:id="@+id/checkPhotoButton"
+                    android:id="@+id/calculateConsumButton"
                     android:layout_width="0dp"
                     android:layout_height="45dp"
                     android:layout_weight="1"
-                    android:background="@drawable/baseline_image_search_24" />
+                    android:background="@drawable/baseline_calculate_24" />
             </LinearLayout>
         </LinearLayout>
         </ScrollView>

@@ -1,20 +1,13 @@
 package com.example.citirecontoare;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
-
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +20,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.mlkit.vision.common.InputImage;
@@ -34,14 +28,8 @@ import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
-
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 
@@ -51,7 +39,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
     private TextView ownerNameTextView, houseNumberTextView;
     private EditText marcaEditText, seriaEditText, diametruEditText, dataInstalareEditText,stareApometruEditText,consumMcEditText,datacitiriiEditText;
     private boolean isInEditMode = false;
-    private ImageButton backButton,manualModifyButton,  previousYearButton, nextYearButton,takePhotoButton;
+    private ImageButton backButton,manualModifyButton,calculateConsumButton,  previousYearButton, nextYearButton,takePhotoButton;
     private  Button nextMonthButton,previousMonthButton;
 
 
@@ -85,12 +73,12 @@ public class HouseDetailsActivity extends AppCompatActivity {
         consumMcEditText = findViewById(R.id.consumMcEditText);
         datacitiriiEditText = findViewById(R.id.datacitiriiEditText);
         backButton = findViewById(R.id.backButton);
-        ImageButton previousYearButton = findViewById(R.id.previousYearButton);
-        ImageButton nextYearButton = findViewById(R.id.nextYearButton);
-        Button previousMonthButton = findViewById(R.id.previousMonthButton);
-        Button nextMonthButton = findViewById(R.id.nextMonthButton);
-        ImageButton takePhotoButton = findViewById(R.id.takePhotoButton);
-
+        previousYearButton = findViewById(R.id.previousYearButton);
+        nextYearButton = findViewById(R.id.nextYearButton);
+        previousMonthButton = findViewById(R.id.previousMonthButton);
+        nextMonthButton = findViewById(R.id.nextMonthButton);
+        takePhotoButton = findViewById(R.id.takePhotoButton);
+        calculateConsumButton = findViewById(R.id.calculateConsumButton);
         // Inițializează restul EditText-urilor aici
 
         currentYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -202,6 +190,9 @@ public class HouseDetailsActivity extends AppCompatActivity {
                 requestCameraPermission();
             }
         });
+
+
+        calculateConsumButton.setOnClickListener(v -> calculateAndSaveConsum());
 
 
     }
@@ -484,6 +475,37 @@ public class HouseDetailsActivity extends AppCompatActivity {
             Log.d("OCR", "No text recognized");
         }
     }
+
+    private void calculateAndSaveConsum() {
+        DocumentReference currentMonthRef = getMonthRef(houseNumber, currentYear, currentMonth);
+        DocumentReference previousMonthRef = getMonthRef(houseNumber, currentYear, currentMonth - 1);
+
+        Task<DocumentSnapshot> currentMonthTask = currentMonthRef.get();
+        Task<DocumentSnapshot> previousMonthTask = previousMonthRef.get();
+
+        Tasks.whenAllSuccess(currentMonthTask, previousMonthTask).addOnSuccessListener(results -> {
+            DocumentSnapshot currentDoc = (DocumentSnapshot) results.get(0);
+            DocumentSnapshot previousDoc = (DocumentSnapshot) results.get(1);
+
+            Long currentStareApometru = currentDoc.getLong("Starea Apometrului");
+            Long previousStareApometru = previousDoc != null ? previousDoc.getLong("Starea Apometrului") : 0; // Assume 0 if null
+
+            if (currentStareApometru != null && previousStareApometru != null) {
+                Long consumMc = currentStareApometru - previousStareApometru;
+                currentMonthRef.update("Consumatia mc", consumMc)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(HouseDetailsActivity.this, "Consumul a fost actualizat.", Toast.LENGTH_SHORT).show();
+                            // Reîncarcă detalii apometru pentru a actualiza UI-ul cu datele cele mai recente
+                            loadApometruDetails(houseNumber, currentYear, currentMonth);
+                        })
+                        .addOnFailureListener(e -> Toast.makeText(HouseDetailsActivity.this, "Eroare la actualizarea consumului.", Toast.LENGTH_SHORT).show());
+            }
+
+        }).addOnFailureListener(e -> {
+            Toast.makeText(HouseDetailsActivity.this, "Eroare la accesarea datelor.", Toast.LENGTH_SHORT).show();
+        });
+    }
+
 
 }
 
