@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,7 +46,8 @@ public class HouseNumbersActivity extends AppCompatActivity {
     private TextView zoneNameTextView;
     private FirebaseFirestore db;
 
-    private Button backButton, downloadButton;
+    private Button  downloadButton;
+    private ImageButton backButton;
 
     public  String[] monthNames = {"Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
             "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"};
