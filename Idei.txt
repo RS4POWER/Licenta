@@ -1,20 +1,9 @@
 Principala functie a aplicatiei trebuie sa fie usurarea muncii muncitorilor de la uzina de apa. 
 
-Ca idee, ei (muncitorii) merg din casa in casa, au o agenda cu numarul fiecarei case, numele locatarului, indexul contorului si cantitatea de apa folosita in fiecare luna precum si diferenta de la o luna la luna actuala, pentru a se da cati metri s-au consumat de cand s-a platit ultima data. E pentru a da direct cati metri cubi de apa trebuie platiti.
+Ca idee, ei (muncitorii) merg din casa in casa, au o agenda pentru fiecare sat, cu numarul fiecarei case, numele locatarului, indexul contorului si cantitatea de apa folosita in fiecare luna precum si diferenta de la o luna la luna actuala, pentru a se da cati metri s-au consumat de cand s-a platit ultima data. E pentru a da direct cati metri cubi de apa trebuie platiti.
 ex: Daca in ianuarie 2024 aveam 240 metri cubi pe contor iar in februarie am 245 metri cubi, asta inseamna ca am de plata 245-240 = 5 metri cubi de apa si tot asa.
 
-Aplicatia mea trebuie sa aibe:
 
-Logare pentru fiecare angajat. In functie de numele contului i se va atribui zona de citire.(De ex Regulas Ioan - Iacobini + Hontisor);
-Editare + adaugare numere case, nume locatar, index contor, cantitatea de apa si diferenta
-Photo contor cu preluare automata date apa consumata si diferenta de luna trecuta
-Stocare in baza de date pe ani, luni si zile (la citire);
-Trecere pret apa + total de plata pentru apa consumata;
-Istoric citiri 
-Poze la fiecare locuitor cu contorul de unde se vor lua si datele si completa automat;
+Aplicatia mea are asa:
 
-Interfata trebuie sa fie de tipul: 
--selectare zona citire
--Toate numerele de casa + numele tutror
-	-La selectarea unui numar, de ex 1; se va duce automat in modul citire unde ai tabele cu date si butonul: editare manual; photo; stergere photo+date ; urmatorul (nr 2); anteriorul (nr 0 nu exista pentru primul nr ); si un buton pagina principala si buton pentru back la lista mare cu numere;
-
+Sign up cu un email si o parola, apoi pe email va primi un email de confirmare cont. Cu adresa de email confirmata te poti loga in aplicatie.Contul va intra in firebase authentification unde, dupa UserUID va fi harcodat 2 zone de citire per utilizator; Dupa logare avem o interfata cu 2 butoane pentru selectarea zonei de citire dintre cele 2; daca dam pe una din ele vom fi redirectionati in acea zona cu numerele ei de case sub forma de lista de butoane dinamice care sunt preluate din baza de date firebase. Avem si buton download data ca sa downloadam toate datele despre citire intr-un fisier json in memoria telefonului. Daca apasam pe un numar de casa suntem redirectionati la pagina cu detaliile despre casa, cum ar fi Nume Proprietar, nr casa; Detalii apometru, detalii consum apometru; avem 2 butoane pentru a trece prin anii de citire si 2 butoane pentru a trece prin luna anterioara si luna urmatoare; Mai avem 3 butoane jos de tot, primul este pentru activare editare date manuale, acel buton la apasare permite editarea edit-texturilor iar apoi se transforma in buton de confirma pentru salvare date editate. Avem alt buton care deschdie camera telefonului si performeaza OCR pe numere si daca gaseste numere valide le va trece in casuta consum apometru; si mai avem un buton pentru care calculeaza consumul de apa de la luna trecuta la luna actuala;

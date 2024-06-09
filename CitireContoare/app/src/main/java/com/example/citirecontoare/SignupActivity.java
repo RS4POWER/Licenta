@@ -45,21 +45,18 @@ public class SignupActivity extends AppCompatActivity {
                 String  email = signupEmail.getText().toString().trim();
                 String   password = signupPassword.getText().toString().trim();
 
-                // Verificăm dacă adresa de email si parola sunt goale
                 if (email.isEmpty() && password.isEmpty())  {
-                    Toast.makeText(SignupActivity.this, "Va rog completati adresa de email si parola.", Toast.LENGTH_SHORT).show();
-                    return; // Întrerupe funcția onClick pentru a evita continuarea operațiilor
+                    Toast.makeText(SignupActivity.this, "Va rog sa completati adresa de email si parola.", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                // Verificăm dacă adresa de email este goală
                 if (email.isEmpty()) {
-                    Toast.makeText(SignupActivity.this, "Te rog introdu o adresă de email.", Toast.LENGTH_SHORT).show();
-                    return; // Întrerupe funcția onClick pentru a evita continuarea operațiilor
+                    Toast.makeText(SignupActivity.this, "Va rog sa introduceti o adresă de email.", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
-                // Verificăm dacă parola este goală
                 if (password.isEmpty()) {
-                    Toast.makeText(SignupActivity.this, "Te rog introdu o parolă.", Toast.LENGTH_SHORT).show();
-                    return; // Întrerupe funcția onClick pentru a evita continuarea operațiilor
+                    Toast.makeText(SignupActivity.this, "Va rog sa introduceti o parolă.", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
 
@@ -77,23 +74,22 @@ public class SignupActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
-                                                        Log.d(TAG, "Email sent.");
-                                                        Toast.makeText(SignupActivity.this, "Activation Email sent.",
+                                                        Log.d(TAG, "Email Trimis.");
+                                                        Toast.makeText(SignupActivity.this, "Email de activare trimis.",
                                                                 Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
                                             });
                                 } else {
                                     if (password.length() < 6) {
-                                        Toast.makeText(SignupActivity.this, "Password must have at least 6 characters.",
+                                        Toast.makeText(SignupActivity.this, "Parola trebuie sa aibe minim 6 caractere.",
                                                 Toast.LENGTH_LONG).show();
                                     } else {
-                                        Toast.makeText(SignupActivity.this, "Authentication failed.",
+                                        Toast.makeText(SignupActivity.this, "Autentificare esuata.",
                                                 Toast.LENGTH_SHORT).show();
                                     }
 
                                     if (task.getException() instanceof FirebaseAuthUserCollisionException){
-                                        // Contul există deja, afișează un mesaj de eroare sau alte acțiuni
                                         Toast.makeText(SignupActivity.this, "Contul există deja. Utilizează o altă adresă de email.", Toast.LENGTH_SHORT).show();
                                     }
                                     }

@@ -40,15 +40,15 @@ public class ResetPasswordActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(ResetPasswordActivity.this, "Check your email for password reset instructions.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(ResetPasswordActivity.this, "Verificați e-mailul pentru instrucțiuni de resetare a parolei.", Toast.LENGTH_SHORT).show();
                                         finish();
                                     } else {
-                                        Toast.makeText(ResetPasswordActivity.this, "Failed to send reset email. Please check your email address.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(ResetPasswordActivity.this, "Trimiterea e-mailului de resetare a eșuat. Vă rugăm să vă verificați adresa de e-mail.", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
                 } else {
-                    Toast.makeText(ResetPasswordActivity.this, "Please enter your email address.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ResetPasswordActivity.this, "Te rugam sa introduci adresa ta de email.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -56,7 +56,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
         backToLoginTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish(); // Close this activity and return to login activity
+                finish();
             }
         });
     }

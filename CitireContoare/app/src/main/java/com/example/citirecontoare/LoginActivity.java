@@ -45,24 +45,21 @@ public class LoginActivity extends AppCompatActivity {
                 String email = loginUsername.getText().toString().trim();
                 String password = loginPassword.getText().toString().trim();
 
-                // Verificăm dacă adresa de email si parola sunt goale
                 if (email.isEmpty() && password.isEmpty())  {
                     Toast.makeText(LoginActivity.this, "Va rog completati adresa de email si parola.", Toast.LENGTH_SHORT).show();
-                    return; // Întrerupe funcția onClick pentru a evita continuarea operațiilor
+                    return;
                 }
-                // Verificăm dacă adresa de email este goală
+
                 if (email.isEmpty()) {
                     Toast.makeText(LoginActivity.this, "Te rog introdu o adresă de email.", Toast.LENGTH_SHORT).show();
-                    return; // Întrerupe funcția onClick pentru a evita continuarea operațiilor
+                    return;
                 }
 
-                // Verificăm dacă parola este goală
                 if (password.isEmpty()) {
                     Toast.makeText(LoginActivity.this, "Te rog introdu o parolă.", Toast.LENGTH_SHORT).show();
-                    return; // Întrerupe funcția onClick pentru a evita continuarea operațiilor
+                    return; // Intrerupe functia onClick pentru a evita continuarea operatiilor
                 }
 
- // varianta buna care merge!
 
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -80,18 +77,18 @@ public class LoginActivity extends AppCompatActivity {
                                         }
                                         else
                                         {
-                                            Toast.makeText(LoginActivity.this, "You have to verify Email first.",
+                                            Toast.makeText(LoginActivity.this, "Verificati adresa de email.",
                                                     Toast.LENGTH_SHORT).show();
                                         }
 
                                 } else {
                                     if (password.length() < 6) {
-                                        Toast.makeText(LoginActivity.this, "Password must have at least 6 characters.",
+                                        Toast.makeText(LoginActivity.this, "Parola trebuie sa aiba cel putin 6 caractere.",
                                                 Toast.LENGTH_LONG).show();
                                     } else {
 
 
-                                        Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                        Toast.makeText(LoginActivity.this, "Autentificare esuata.",
                                                 Toast.LENGTH_SHORT).show();
                                     }
 
@@ -112,7 +109,6 @@ public class LoginActivity extends AppCompatActivity {
         resetPasswordTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Deschideți activitatea ResetPasswordActivity
                 startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
             }
         });

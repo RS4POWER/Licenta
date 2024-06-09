@@ -80,12 +80,11 @@ public class HouseNumbersActivity extends AppCompatActivity {
         downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Verifică permisiunile înainte de a începe descărcarea
                 if (ContextCompat.checkSelfPermission(HouseNumbersActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    // Dacă nu sunt permisiunile necesare, cere-le
+
                     ActivityCompat.requestPermissions(HouseNumbersActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 } else {
-                    // Dacă permisiunile sunt deja acordate, începe descărcarea datelor
+
                     downloadData(v);
                 }
             }
@@ -95,11 +94,11 @@ public class HouseNumbersActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Permisiunea a fost acordată
+
             View view = new View(this);
             downloadData(view);
         } else {
-            // Permisiunea a fost refuzată
+
             Toast.makeText(this, "Permisiunea pentru scriere pe stocare externă este necesară pentru a descărca datele.", Toast.LENGTH_LONG).show();
         }
     }
@@ -111,20 +110,16 @@ public class HouseNumbersActivity extends AppCompatActivity {
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        // Crează o listă pentru a stoca numerele caselor împreună cu documentele asociate
                         List<DocumentSnapshot> houseDocumentsList = new ArrayList<>();
-
-                        // Adaugă toate documentele în listă
                         houseDocumentsList.addAll(task.getResult().getDocuments());
 
-                        // Sortează lista folosind numărul casei
+                        // Sortare lista dupa nr casei
                         Collections.sort(houseDocumentsList, (d1, d2) -> {
                             Long num1 = d1.getLong("Numar casa");
                             Long num2 = d2.getLong("Numar casa");
                             return num1.compareTo(num2);
                         });
-
-                        // Adaugă butoanele în interfață în ordinea corectă
+                        //Adaugare butoane nr casa in lista
                         for (DocumentSnapshot document : houseDocumentsList) {
                             Long houseNumber = document.getLong("Numar casa");
                             if (houseNumber != null) {
@@ -134,13 +129,8 @@ public class HouseNumbersActivity extends AppCompatActivity {
                                         LinearLayout.LayoutParams.MATCH_PARENT,
                                         LinearLayout.LayoutParams.WRAP_CONTENT));
 
-                                // Aici setezi un tag pentru buton, care poate fi folosit in listener pentru a identifica care buton a fost apasat
                                 houseButton.setTag(houseNumber);
-
                                 houseButton.setOnClickListener(v -> {
-                                    // Acțiunea când se apasă pe butonul casei
-                                    // Aici pot deschide o nouă activitate sau fragment cu detaliile casei
-                                    // folosind houseNumber sau document.getId() ca identificator
 
                                     Log.w(TAG, "S-a deschis numarul de casa." + houseNumber);
                                     Long selectedHouseNumber = (Long) v.getTag();
@@ -159,7 +149,7 @@ public class HouseNumbersActivity extends AppCompatActivity {
 
     public void openHouseDetails(Long houseNumber) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        // Concatenează "Numarul " cu numărul casei pentru a obține numele documentului corect
+
         String documentName = "Numarul " + houseNumber;
         DocumentReference houseRef = db.collection("zones")
                 .document(zoneName)
@@ -171,8 +161,8 @@ public class HouseNumbersActivity extends AppCompatActivity {
                 Intent intent = new Intent(HouseNumbersActivity.this, HouseDetailsActivity.class);
                 intent.putExtra("HOUSE_NUMBER", houseNumber);
                 intent.putExtra("ZONE_NAME", zoneName);
-                String ownerName = documentSnapshot.getString("Proprietar"); // presupunând că acesta este numele câmpului
-                intent.putExtra("OWNER_NAME", ownerName); // Pasăm numele proprietarului către noua activitate
+                String ownerName = documentSnapshot.getString("Proprietar");
+                intent.putExtra("OWNER_NAME", ownerName);
                 Log.d(TAG, "numar casa: " + houseNumber + " proprietar: " + ownerName);
                 startActivity(intent);
             } else {
@@ -208,7 +198,6 @@ public class HouseNumbersActivity extends AppCompatActivity {
                                         .document(month)
                                         .get();
 
-                                // Ensure the continuation task returns a Map<String, Object>
                                 Task<Map<String, Object>> continuationTask = monthTask.continueWith(task1 -> {
                                     DocumentSnapshot monthDoc = task1.getResult();
                                     if (monthDoc != null && monthDoc.exists()) {
@@ -219,7 +208,6 @@ public class HouseNumbersActivity extends AppCompatActivity {
                                 monthTasks.add(continuationTask);
                             }
 
-                            // When all month tasks complete, combine all month data into one map and add it to houseData
                             Tasks.whenAllSuccess(monthTasks).addOnSuccessListener(monthResults -> {
                                 Map<String, Object> monthsData = new HashMap<>();
                                 for (Object result : monthResults) {
@@ -232,7 +220,6 @@ public class HouseNumbersActivity extends AppCompatActivity {
                             subTasks.add(Tasks.whenAll(monthTasks).continueWith(task2 -> houseData));
                         }
 
-                        // When all house tasks complete (all data aggregated), create the JSON file
                         Tasks.whenAllSuccess(subTasks).addOnSuccessListener(houseDetails -> {
                             try {
                                 createJsonFile(houseDetailsList);
@@ -250,7 +237,7 @@ public class HouseNumbersActivity extends AppCompatActivity {
 
 
     private void createJsonFile(ArrayList<Map<String, Object>> dataList) throws IOException {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();  // Use GsonBuilder to enable pretty printing
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String jsonString = gson.toJson(dataList);
 
         File file = new File(getExternalFilesDir(null), "HouseData.json");

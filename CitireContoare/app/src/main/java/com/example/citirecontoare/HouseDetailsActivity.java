@@ -42,14 +42,10 @@ public class HouseDetailsActivity extends AppCompatActivity {
     private ImageButton backButton,manualModifyButton,calculateConsumButton,  previousYearButton, nextYearButton,takePhotoButton;
     private  Button nextMonthButton,previousMonthButton;
 
-
-    // Adaug restul EditText-urilor pentru consum, stare, data citirii, etc.
-
     private int currentYear;
     private int currentMonth;
     private Long houseNumber;
     private String zoneName;
-
     boolean succes;
 
     public  String[] monthNames = {"Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
@@ -59,8 +55,6 @@ public class HouseDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_house_details);
-
-        // Inițializează componentele UI
 
         ownerNameTextView = findViewById(R.id.ownerNameTextView);
         houseNumberTextView = findViewById(R.id.houseNumberTextView);
@@ -79,12 +73,9 @@ public class HouseDetailsActivity extends AppCompatActivity {
         nextMonthButton = findViewById(R.id.nextMonthButton);
         takePhotoButton = findViewById(R.id.takePhotoButton);
         calculateConsumButton = findViewById(R.id.calculateConsumButton);
-        // Inițializează restul EditText-urilor aici
 
         currentYear = Calendar.getInstance().get(Calendar.YEAR);
         currentMonth = Calendar.getInstance().get(Calendar.MONTH);
-
-
 
 
         updateDateDisplay();
@@ -140,37 +131,36 @@ public class HouseDetailsActivity extends AppCompatActivity {
         manualModifyButton.setOnClickListener(v -> {
             isInEditMode = !isInEditMode;
 
-            // Actualizează iconița butonului
+            // Actualizez iconița butonului
             if (isInEditMode) {
                 manualModifyButton.setBackgroundResource(R.drawable.baseline_done_outline_24);
             } else {
                 manualModifyButton.setBackgroundResource(R.drawable.baseline_edit_note_24);
                 Log.d("ManualModifiyButon", "s-a apelat listener pentru manualModify");
-                saveHouseDetails(); // Salvează datele când ieși din modul de editarehoue
+                saveHouseDetails();
                 saveApometruDetails();
             }
             toggleEditMode(isInEditMode);
         });
 
 
-        // Obține numărul casei, numele zonei  și numele proprietarului din intent
+        // Obținere numarul casei, numele zonei  și numele proprietarului din intent
         Intent intent = getIntent();
          houseNumber = intent.getLongExtra("HOUSE_NUMBER", -1);
         zoneName = intent.getStringExtra("ZONE_NAME");
         if(houseNumber == -1) {
             Toast.makeText(this, "Numărul casei nu a fost transmis corect.", Toast.LENGTH_SHORT).show();
-            finish(); // Închide activitatea dacă numărul casei nu este valid
+            finish();
             return;
         }
         if(zoneName == null) {
             Toast.makeText(this, "Zona nu a fost transmisa corect.", Toast.LENGTH_SHORT).show();
-            finish(); // Închide activitatea dacă numărul casei nu este valid
+            finish();
             return;
         }
-        // Setează numărul casei în TextView
+
         houseNumberTextView.setText(String.valueOf("NR "+houseNumber));
 
-        // Aduce detalii specifice casei din Firestore
         loadHouseDetails(houseNumber,zoneName);
         loadApometruDetails(houseNumber, currentYear, currentMonth);
 
@@ -199,7 +189,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
 
     private void loadHouseDetails(Long houseNumber, String zoneName) {
         DocumentReference houseRef = db.collection("zones")
-                .document(zoneName) // Acesta ar trebui să fie ID-ul zonei, înlocuiește-l cu valoarea corectă
+                .document(zoneName)
                 .collection("numereCasa")
                 .document("Numarul " + houseNumber);
 
@@ -212,7 +202,6 @@ public class HouseDetailsActivity extends AppCompatActivity {
                 diametruEditText.setText(documentSnapshot.getLong("Diametru apometru").toString());
                 dataInstalareEditText.setText(documentSnapshot.getString("Instalat la"));
 
-                // Completează restul EditText-urilor cu datele din document
             } else {
                 Toast.makeText(this, "Detalii despre casă nu au fost găsite.", Toast.LENGTH_SHORT).show();
             }
@@ -243,8 +232,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
                     stareApometruEditText.setText("Nedefinit");
                 }
 
-                // Procesează restul datelor ca string-uri
-                consumMcEditText.setText(String.valueOf(documentSnapshot.getLong("Consumatia mc"))); // Convertim numărul la String
+                consumMcEditText.setText(String.valueOf(documentSnapshot.getLong("Consumatia mc"))); // Convertim numarul la String
                 datacitiriiEditText.setText(documentSnapshot.getString("Data citire"));
 
             } else {
@@ -261,7 +249,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
 
     private DocumentReference getMonthRef(Long houseNumber, int year, int month) {
         if (month < 0) {
-            year -= 1; // Dacă luna este negativă, înseamnă că trebuie să te întorci în anul precedent
+            year -= 1;
             month = 11; // Decembrie este luna 11 (0 indexat)
         }
         String monthName = monthNames[month];
@@ -279,17 +267,16 @@ public class HouseDetailsActivity extends AppCompatActivity {
         stareApometruEditText.setEnabled(isInEditMode);
         consumMcEditText.setEnabled(isInEditMode);
         datacitiriiEditText.setEnabled(isInEditMode);
-        // Activează sau dezactivează restul EditText-urilor în funcție de isInEditMode
+
     }
 
     @SuppressLint("SuspiciousIndentation")
     private void saveHouseDetails() {
-        // Obține datele din EditText-uri și le salvează în Firestore
+
         String marca = marcaEditText.getText().toString();
         String seria = seriaEditText.getText().toString();
         String diametru = diametruEditText.getText().toString();
         String dataInstalare = dataInstalareEditText.getText().toString();
-        // Obține restul datelor din EditText-uri
 
         if (!isValidNumber(diametru)) {
             succes = false;
@@ -300,27 +287,25 @@ public class HouseDetailsActivity extends AppCompatActivity {
             succes=true;
         }
 
-        // Referința la documentul Firestore al casei
         Long houseNumber = getIntent().getLongExtra("HOUSE_NUMBER", -1);
         DocumentReference houseRef = db.collection("zones").document(zoneName)
                 .collection("numereCasa").document("Numarul " + houseNumber);
 
-        // Map pentru a stoca datele
         Map<String, Object> houseDetails = new HashMap<>();
         houseDetails.put("Apometru marca", marca);
         houseDetails.put("Seria", seria);
         houseDetails.put("Diametru apometru", Long.parseLong(diametru)); // asigură-te că acesta este un număr
         houseDetails.put("Instalat la", dataInstalare);
-        // Adaugă restul datelor în map
 
-        // Actualizează în Firestore
+
+        // Actualizare în Firestore
         houseRef.update(houseDetails)
                 .addOnSuccessListener(aVoid -> {
                     if(succes!=false)
                     Toast.makeText(HouseDetailsActivity.this, "Datele au fost salvate cu succes!", Toast.LENGTH_SHORT).show();
-                    isInEditMode = false; // Dezactivează modul de editare după salvare
-                    toggleEditMode(false); // Actualizează UI-ul
-                    //manualModifyButton.setImageResource(R.drawable.baseline_edit_note_24); // Schimbă iconița înapoi
+                    isInEditMode = false;
+                    toggleEditMode(false);
+
                 })
                 .addOnFailureListener(e -> Toast.makeText(HouseDetailsActivity.this, "Eroare la salvarea datelor.", Toast.LENGTH_SHORT).show());
 
@@ -372,16 +357,15 @@ public class HouseDetailsActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(HouseDetailsActivity.this, "Eroare la actualizarea datelor apometrului.", Toast.LENGTH_SHORT).show());
     }
 
-
-    private boolean isValidNumber(String numberStr) {
-        try {
-            Double.parseDouble(numberStr);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+private boolean isValidNumber(String numberStr) {
+    try {
+        double parsedNumber = Double.parseDouble(numberStr);
+        String normalizedNumber = String.valueOf((long) parsedNumber);
+        return normalizedNumber.equals(numberStr.replaceFirst("^0+(?!$)", ""));
+    } catch (NumberFormatException e) {
+        return false;
     }
-
+}
 
     private void updateDateDisplay() {
         String monthName = monthNames[currentMonth];
@@ -407,7 +391,7 @@ public class HouseDetailsActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startCamera();
             } else {
-                Toast.makeText(this, "Camera permission is necessary to use this feature", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Este necesara permisiunea de acces la camera pentru aceasta functionalitate", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -468,11 +452,15 @@ public class HouseDetailsActivity extends AppCompatActivity {
             else
             if (!blockText.matches("\\d+")) {
                 Log.d("OCR", "Non-numeric text detected: " + blockText);
+                loadApometruDetails(houseNumber, currentYear, currentMonth);
             }
 
         }
         if(resultText.isEmpty()) {
             Log.d("OCR", "No text recognized");
+            //Toast.makeText(HouseDetailsActivity.this, "Nu s-a recunoscut consumul de pe contor.",
+              //      Toast.LENGTH_SHORT).show();
+            loadApometruDetails(houseNumber, currentYear, currentMonth);
         }
     }
 
@@ -495,7 +483,6 @@ public class HouseDetailsActivity extends AppCompatActivity {
                 currentMonthRef.update("Consumatia mc", consumMc)
                         .addOnSuccessListener(aVoid -> {
                             Toast.makeText(HouseDetailsActivity.this, "Consumul a fost actualizat.", Toast.LENGTH_SHORT).show();
-                            // Reîncarcă detalii apometru pentru a actualiza UI-ul cu datele cele mai recente
                             loadApometruDetails(houseNumber, currentYear, currentMonth);
                         })
                         .addOnFailureListener(e -> Toast.makeText(HouseDetailsActivity.this, "Eroare la actualizarea consumului.", Toast.LENGTH_SHORT).show());
